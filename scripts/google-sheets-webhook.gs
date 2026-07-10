@@ -23,18 +23,20 @@ function doPost(e) {
     sheet.appendRow([
       payload.submittedAt || new Date().toISOString(),
       payload.nome || "",
+      payload.cargo || "",
       payload.email || "",
       payload.whatsapp || "",
       payload.empresa || "",
-      payload.cidade || "",
       payload.estado || "",
       payload.produto || "",
-      payload.prazo_adequacao || "",
-      boolToLabel(payload.possui_car),
-      boolToLabel(payload.possui_georef),
-      boolToLabel(payload.exporta_ue),
-      boolToLabel(payload.tem_doc_cadeia),
-      boolToLabel(payload.tem_hist_ambiental),
+      payload.area_total || "",
+      payload.destino_producao || "",
+      listToLabel(payload.documentos_em_dia),
+      payload.situacao_car || "",
+      payload.georreferenciamento || "",
+      payload.volume_anual || "",
+      payload.contrato_exportacao || "",
+      payload.objetivo_principal || "",
       payload.observacoes || "",
       diagnosis.level || "",
       diagnosis.score || "",
@@ -57,18 +59,20 @@ function ensureHeader(sheet) {
   sheet.appendRow([
     "submittedAt",
     "nome",
+    "cargo",
     "email",
     "whatsapp",
     "empresa",
-    "cidade",
     "estado",
     "produto",
-    "prazo_adequacao",
-    "possui_car",
-    "possui_georef",
-    "exporta_ue",
-    "tem_doc_cadeia",
-    "tem_hist_ambiental",
+    "area_total",
+    "destino_producao",
+    "documentos_em_dia",
+    "situacao_car",
+    "georreferenciamento",
+    "volume_anual",
+    "contrato_exportacao",
+    "objetivo_principal",
     "observacoes",
     "diagnosis_level",
     "diagnosis_score",
@@ -76,6 +80,7 @@ function ensureHeader(sheet) {
   ]);
 }
 
-function boolToLabel(value) {
-  return value ? "Sim" : "Não";
+function listToLabel(value) {
+  if (!Array.isArray(value)) return "";
+  return value.join(", ");
 }
