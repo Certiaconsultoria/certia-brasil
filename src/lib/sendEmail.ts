@@ -31,20 +31,21 @@ export async function sendDiagnosisEmails(
   }
 
   const resend = new Resend(apiKey);
+  const sender = formatSender(from);
   const customer = customerDiagnosisEmail(input, diagnosis);
   const internal = internalLeadEmail(input, diagnosis);
 
   const [customerResponse, internalResponse] = await Promise.all([
     sendResendEmail({
       resend,
-      from,
+      from: sender,
       to: input.email,
       subject: customer.subject,
       html: customer.html,
     }),
     sendResendEmail({
       resend,
-      from,
+      from: sender,
       to: internalTo,
       subject: internal.subject,
       html: internal.html,
@@ -105,4 +106,12 @@ async function sendResendEmail({
     ok: true as const,
     id: data?.id,
   };
+}
+
+function formatSender(from: string) {
+  if (from.includes("<") && from.includes(">")) {
+    return from;
+  }
+
+  return `CERTIA Brasil <${from}>`;
 }
