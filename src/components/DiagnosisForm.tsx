@@ -8,6 +8,17 @@ type DiagnosisResponse = {
     score: number;
     level: string;
     message: string;
+    opportunityTitle: string;
+    urgencyLabel: string;
+    nextStep: string;
+    blockers: string[];
+    premiumPercent: number;
+    annualOpportunity: string;
+    creditSavings: string;
+    buyerAccess: string;
+    premiumHeadline: string;
+    missedOpportunity: string;
+    disclaimer: string;
   };
   delivery: {
     lead:
@@ -77,29 +88,88 @@ export function DiagnosisForm() {
   };
 
   if (success) {
+    const whatsappText = encodeURIComponent(
+      `Olá, acabei de fazer o diagnóstico CERTIA e quero entender como destravar ${success.diagnosis.annualOpportunity} em oportunidade estimada. Meu resultado foi ${success.diagnosis.level}.`,
+    );
+    const whatsappHref = `https://wa.me/${siteConfig.whatsapp}?text=${whatsappText}`;
+
     return (
-      <div className="rounded-[2rem] border border-brand-line bg-brand-navy/70 p-8 text-center shadow-soft">
-        <p className="text-xs uppercase tracking-[0.35em] text-brand-gold">Resultado preliminar</p>
-        <h2 className="mt-3 font-serif text-4xl text-brand-cream">
-          {success.diagnosis.level}
-        </h2>
-        <p className="mt-4 text-brand-cream/80">{success.diagnosis.message}</p>
-        <p className="mt-4 text-sm text-brand-cream/70">
-          Seus dados foram recebidos e a equipe da CERTIA pode usar esse contato para orientar os
-          próximos passos.
-        </p>
-        <div className="mt-6 space-y-2 text-sm text-brand-cream/75">
-          <p>{leadStatusMessage(success.delivery.lead)}</p>
-          <p>{emailStatusMessage(success.delivery.email)}</p>
+      <div className="space-y-6 rounded-[2rem] border border-brand-line bg-brand-navy/70 p-5 shadow-soft sm:p-8">
+        <div className="text-center">
+          <p className="text-[11px] uppercase tracking-[0.24em] text-brand-gold sm:text-xs sm:tracking-[0.35em]">Resultado preliminar</p>
+          <h2 className="mt-3 text-balance font-serif text-3xl text-brand-cream sm:text-4xl">
+            {success.diagnosis.opportunityTitle}
+          </h2>
+          <p className="mt-4 text-brand-cream/80">{success.diagnosis.message}</p>
         </div>
-        <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <MetricCard
+            label="Potencial indicativo"
+            value={success.diagnosis.annualOpportunity}
+            detail={`faixa de oportunidade anual`}
+          />
+          <MetricCard
+            label="Prêmio potencial"
+            value={`+${success.diagnosis.premiumPercent}%`}
+            detail="margem comercial indicativa"
+          />
+          <MetricCard
+            label="Crédito verde"
+            value={success.diagnosis.creditSavings}
+            detail="alívio estimado no custo"
+          />
+        </div>
+
+        <div className="rounded-[1.5rem] border border-brand-line bg-brand-green-deep/20 p-6">
+          <p className="text-[11px] uppercase tracking-[0.24em] text-brand-gold sm:text-xs sm:tracking-[0.35em]">Oportunidade que pode estar escapando</p>
+          <h3 className="mt-3 text-balance font-serif text-2xl text-brand-cream sm:text-3xl">{success.diagnosis.level}</h3>
+          <p className="mt-3 text-brand-cream/78">{success.diagnosis.missedOpportunity}</p>
+          <p className="mt-4 text-sm text-brand-cream/70">{success.diagnosis.premiumHeadline}</p>
+        </div>
+
+        <div className="grid gap-4 lg:grid-cols-2">
+          <div className="rounded-[1.5rem] border border-brand-line bg-brand-navy-deep/50 p-6">
+            <p className="text-[11px] uppercase tracking-[0.24em] text-brand-gold sm:text-xs sm:tracking-[0.35em]">O que hoje trava esse ganho</p>
+            <div className="mt-4 space-y-3 text-sm text-brand-cream/80">
+              {success.diagnosis.blockers.map((blocker) => (
+                <p key={blocker}>• {blocker}</p>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-[1.5rem] border border-brand-line bg-brand-navy-deep/50 p-6">
+            <p className="text-[11px] uppercase tracking-[0.24em] text-brand-gold sm:text-xs sm:tracking-[0.35em]">Próximo passo recomendado</p>
+            <p className="mt-4 text-brand-cream/80">{success.diagnosis.nextStep}</p>
+            <p className="mt-4 text-[11px] uppercase tracking-[0.2em] text-brand-gold sm:text-sm sm:tracking-[0.25em]">
+              {success.diagnosis.urgencyLabel}
+            </p>
+            <p className="mt-3 text-sm text-brand-cream/70">
+              Acesso comercial estimado: {success.diagnosis.buyerAccess}
+            </p>
+          </div>
+        </div>
+
+        <div className="rounded-[1.5rem] border border-brand-line bg-brand-navy/55 p-6 text-center">
+          <p className="text-balance font-serif text-2xl text-brand-gold">Você já viu o tamanho da oportunidade. Agora precisa decidir se vai capturá-la.</p>
+          <p className="mt-3 text-brand-cream/78">
+            Seus dados foram recebidos e a equipe da CERTIA pode usar esse contato para orientar os próximos passos.
+          </p>
+          <div className="mt-4 space-y-2 text-sm text-brand-cream/75">
+            <p>{leadStatusMessage(success.delivery.lead)}</p>
+            <p>{emailStatusMessage(success.delivery.email)}</p>
+            <p>{success.diagnosis.disclaimer}</p>
+          </div>
+        </div>
+
+        <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row sm:flex-wrap">
           <a
-            href={siteConfig.secondaryCta.href}
+            href={whatsappHref}
             target="_blank"
             rel="noopener noreferrer"
             className="rounded-full bg-brand-gold px-6 py-3 font-semibold text-brand-navy-deep transition hover:bg-brand-gold-soft"
           >
-            Falar com especialista
+            Quero destravar essa oportunidade
           </a>
           <button
             type="button"
@@ -170,7 +240,7 @@ export function DiagnosisForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-full bg-brand-gold px-6 py-4 font-semibold text-brand-navy-deep transition hover:bg-brand-gold-soft disabled:cursor-not-allowed disabled:bg-brand-line disabled:text-brand-cream/50"
+        className="inline-flex min-h-14 w-full items-center justify-center rounded-full bg-brand-gold px-6 py-4 font-semibold text-brand-navy-deep transition hover:bg-brand-gold-soft disabled:cursor-not-allowed disabled:bg-brand-line disabled:text-brand-cream/50"
       >
         {loading ? "Processando..." : "Ver meu diagnóstico preliminar"}
       </button>
@@ -200,6 +270,24 @@ function emailStatusMessage(delivery: DiagnosisResponse["delivery"]["email"]) {
   }
 
   return `Envio de e-mail ainda não configurado: ${delivery.reason}`;
+}
+
+function MetricCard({
+  label,
+  value,
+  detail,
+}: {
+  label: string;
+  value: string;
+  detail: string;
+}) {
+  return (
+    <div className="rounded-[1.25rem] border border-brand-line bg-brand-navy-deep/50 p-5 text-center">
+      <p className="text-[11px] uppercase tracking-[0.22em] text-brand-gold sm:text-xs sm:tracking-[0.3em]">{label}</p>
+      <p className="mt-3 font-serif text-3xl text-brand-cream sm:text-4xl">{value}</p>
+      <p className="mt-2 text-sm text-brand-cream/70">{detail}</p>
+    </div>
+  );
 }
 
 type FieldProps = {
