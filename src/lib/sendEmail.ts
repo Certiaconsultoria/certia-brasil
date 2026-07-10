@@ -1,3 +1,4 @@
+import { Resend } from "resend";
 import { customerDiagnosisEmail } from "@/emails/customerDiagnosisEmail";
 import { internalLeadEmail } from "@/emails/internalLeadEmail";
 import type { DiagnosisInput } from "@/schemas/diagnosisSchema";
@@ -25,24 +26,26 @@ export async function sendDiagnosisEmails(
     return {
       status: "skipped",
       reason:
-        "Envios de e-mail não configurados. Defina RESEND_API_KEY, RESEND_FROM_EMAIL e RESEND_INTERNAL_TO.",
+        "Envio de e-mail temporariamente indisponível nesta implantação.",
     };
   }
 
+  const resend = new Resend(apiKey);
+  const sender = formatSender(from);
   const customer = customerDiagnosisEmail(input, diagnosis);
   const internal = internalLeadEmail(input, diagnosis);
 
   const [customerResponse, internalResponse] = await Promise.all([
     sendResendEmail({
-      apiKey,
-      from,
+      resend,
+      from: sender,
       to: input.email,
       subject: customer.subject,
       html: customer.html,
     }),
     sendResendEmail({
-      apiKey,
-      from,
+      resend,
+      from: sender,
       to: internalTo,
       subject: internal.subject,
       html: internal.html,
@@ -70,47 +73,45 @@ export async function sendDiagnosisEmails(
 }
 
 async function sendResendEmail({
-  apiKey,
+  resend,
   from,
   to,
   subject,
   html,
   text,
 }: {
-  apiKey: string;
+  resend: Resend;
   from: string;
   to: string;
   subject: string;
   html: string;
   text?: string;
 }) {
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from,
-      to: [to],
-      subject,
-      html,
-      text,
-    }),
+  const { data, error } = await resend.emails.send({
+    from,
+    to: [to],
+    subject,
+    html,
+    text,
   });
 
-  if (!response.ok) {
-    const body = await response.text();
+  if (error) {
     return {
       ok: false as const,
-      error: `Resend retornou ${response.status}: ${body}`,
+      error: `Resend retornou erro: ${error.message}`,
     };
   }
 
-  const payload = (await response.json()) as { id?: string };
-
   return {
     ok: true as const,
-    id: payload.id,
+    id: data?.id,
   };
+}
+
+function formatSender(from: string) {
+  if (from.includes("<") && from.includes(">")) {
+    return from;
+  }
+
+  return `CERTIA Brasil <${from}>`;
 }
