@@ -1,7 +1,26 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  color-scheme: dark;
+}
+
 body {
-  @apply bg-white text-gray-900 antialiased;
+  @apply bg-brand-navy-deep font-sans text-brand-cream antialiased;
+  background-attachment: fixed;
+}
+
+a,
+button,
+input,
+textarea {
+  @apply transition;
+}
+
+::selection {
+  background: rgba(201, 169, 97, 0.35);
+  color: #f5f5f0;
 }
