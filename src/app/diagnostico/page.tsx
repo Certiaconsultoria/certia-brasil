@@ -13,14 +13,24 @@ export default function DiagnosticoPage() {
     setError("");
 
     const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData.entries());
-
-    // Converter checkboxes para booleanos
-    data.possui_car = data.possui_car === "on";
-    data.possui_georef = data.possui_georef === "on";
-    data.exporta_ue = data.exporta_ue === "on";
-    data.tem_doc_cadeia = data.tem_doc_cadeia === "on";
-    data.tem_hist_ambiental = data.tem_hist_ambiental === "on";
+    
+    // Construído objeto manualmente para resolver o erro de tipagem do TypeScript
+    const data: any = {
+      nome: formData.get("nome"),
+      email: formData.get("email"),
+      whatsapp: formData.get("whatsapp"),
+      empresa: formData.get("empresa"),
+      cidade: formData.get("cidade"),
+      estado: formData.get("estado"),
+      produto: formData.get("produto"),
+      observacoes: formData.get("observacoes") || "",
+      possui_car: formData.get("possui_car") === "on",
+      possui_georef: formData.get("possui_georef") === "on",
+      exporta_ue: formData.get("exporta_ue") === "on",
+      tem_doc_cadeia: formData.get("tem_doc_cadeia") === "on",
+      tem_hist_ambiental: formData.get("tem_hist_ambiental") === "on",
+      aceite: formData.get("aceite") === "on",
+    };
 
     try {
       const res = await fetch("/api/diagnostico", {
