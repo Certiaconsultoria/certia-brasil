@@ -26,7 +26,7 @@ export async function sendDiagnosisEmails(
     return {
       status: "skipped",
       reason:
-        "Envios de e-mail não configurados. Defina RESEND_API_KEY, RESEND_FROM_EMAIL e RESEND_INTERNAL_TO. Troque re_xxxxxxxxx pela sua chave real do Resend no ambiente.",
+        "Envio de e-mail temporariamente indisponível nesta implantação.",
     };
   }
 
