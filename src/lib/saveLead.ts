@@ -74,7 +74,14 @@ async function saveLeadToGoogleSheetsWebhook(
   input: DiagnosisInput,
   diagnosis: DiagnosisResult,
 ): Promise<SaveLeadResult> {
-  const response = await fetch(process.env.GOOGLE_SHEETS_WEBHOOK_URL as string, {
+  const webhookUrl = new URL(process.env.GOOGLE_SHEETS_WEBHOOK_URL as string);
+  const secret = process.env.GOOGLE_SHEETS_WEBHOOK_SECRET;
+
+  if (secret) {
+    webhookUrl.searchParams.set("secret", secret);
+  }
+
+  const response = await fetch(webhookUrl.toString(), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
