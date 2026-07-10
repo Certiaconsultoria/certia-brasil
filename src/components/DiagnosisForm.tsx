@@ -501,9 +501,9 @@ export function DiagnosisForm() {
                   type="checkbox"
                   checked={form.aceite}
                   onChange={(event) => updateField("aceite", event.target.checked)}
-                  className="mt-1 h-4 w-4 rounded border-brand-line"
+                  className="mt-0.5 h-4 w-4 shrink-0 rounded border-brand-line"
                 />
-                <span>
+                <span className="leading-6">
                   Aceito a{" "}
                   <a href="/politica-de-privacidade" className="text-brand-gold underline">
                     política de privacidade
